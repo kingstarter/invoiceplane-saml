@@ -1,0 +1,1 @@
+This package is planned to be a plugin for [InvoicePlane|https://github.com/InvoicePlane/InvoicePlane] to integrate SAML within InvoicePlane. Using the package shall IP act as an SAML service provider. An IDP integration is currently not planned.

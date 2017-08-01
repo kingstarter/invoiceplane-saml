@@ -1,0 +1,16 @@
+{
+    "name": "kingstarter/invoiceplane-saml",
+    "description": "A saml plugin for InvoicePlane 1.5",
+    "keywords": ["saml", "saml2", "onelogin"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Steve Hegenbart",
+            "email": "steve.hegenbart@kingstarter.de"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.6"
+    }
+}
