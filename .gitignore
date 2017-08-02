@@ -5,6 +5,7 @@ build
 bin
 logs
 config
+vendor
 
 #########################
 # Files
@@ -12,4 +13,5 @@ config
 .*.swp
 *~
 *.log
+composer.lock
 

@@ -11,6 +11,10 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.6"
+        "php": ">=5.6",
+        "onelogin/php-saml": "^2.11"
+    },
+    "autoload": {
+        "KingStarter\\InvoicePlaneSaml\\": "src/"
     }
 }
