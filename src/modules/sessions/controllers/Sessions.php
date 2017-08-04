@@ -14,6 +14,9 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
  * plugin. 
  */
 
+require_once(APPPATH . '/modules/settings/controllers/SamlSettings.php');
+require_once(FCPATH . '/vendor/onelogin/php-saml/_toolkit_loader.php');
+
 /**
  * Class Sessions
  */
@@ -74,9 +77,87 @@ class Sessions extends Base_Controller
         $this->load->view('session_login', $view_data);
     }
     
+    /**
+     * Make a SAML login request against the IDP
+     */
     public function samllogin()
     {
-        $this->load->view('session_samllogin');
+        $samlSettings = new SamlSettings();
+        $authRequest = new \OneLogin_Saml2_Auth($samlSettings->getSamlSettings());
+        $url = $authRequest->login();
+        $this->response->redirect($url);
+    }
+
+    /**
+     * Authenticate via SAML response from IDP
+     */
+    public function samlauth()
+    {
+        $this->load->model('mdl_sessions');
+
+        $settings = new SamlSettings();
+        try {
+            if (isset($_POST['SAMLResponse'])) {
+                $samlSettings = new \OneLogin_Saml2_Settings($settings->getSamlSettings(), true);
+                $samlResponse = new \OneLogin_Saml2_Response($samlSettings, $_POST['SAMLResponse']);
+                if ($samlResponse->isValid()) {
+  
+                    /**
+                     * DEBUG OUTPUT
+                     * Use this for debugging and checking your saml configuration
+                     */
+//                    /*
+                    echo 'You are: ' . $samlResponse->getNameId() . '<br>';
+                    $attributes = $samlResponse->getAttributes();
+                    if (!empty($attributes)) {
+                        echo 'You have the following attributes:<br>';
+                        echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
+                        foreach ($attributes as $attributeName => $attributeValues) {
+                           echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
+                           foreach ($attributeValues as $attributeValue) {
+                               echo '<li>' . htmlentities($attributeValue) . '</li>';
+                           }
+                           echo '</ul></td></tr>';
+                        }
+                        echo '</tbody></table>';
+                    }
+                    echo '<br />Other attributes:<br /><ul>';
+                    echo '<li>Config username: ' . get_setting('saml_map_username') . '</li>';
+                    echo '<li>Config mailaddr: ' . get_setting('saml_map_mail') . '</li>';
+                    echo '</ul><br />';
+//                    */
+  
+                    // Get attributes for SAML from configModel
+                    $atrb_email     = get_setting('saml_map_mail');
+                    $atrb_username  = get_setting('saml_map_username');
+  
+                    // Get user information via specified attributes
+                    $email      = $samlResponse->getAttributes()["$atrb_email"]['0'];
+                    $username   = $samlResponse->getAttributes()["$atrb_username"]['0'];
+  
+                    // Check if username and email are set
+                    if (!empty($username) && !empty($email)) {
+                        // Create user by having email as username
+                        $this->userInfo = new SamlUserProvider($username, $email, '');
+                        return true;
+    
+                    } else {
+                        die('Invalid username and email.');
+                    }
+    
+                } else {
+                    die('Invalid SAML Response.');
+                }
+            } else {
+                // In case of no SAML response, go on with app
+                return false;
+            }
+        } catch (Exception $e) {
+            // In case of invalid SAML response:
+            echo 'Invalid SAML Response: ' . $e->getMessage();
+        }
+    
+        return false;
     }
 
     /**
