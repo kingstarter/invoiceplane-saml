@@ -7,6 +7,8 @@
 
 $lang = array(
     // SAML plugin
+    'saml'                                         => 'Saml',
+    'saml_login'                                   => 'Login via SAML',
     'saml_sp'                                      => 'InvoicePlane Service Provider Configuration',
     'saml_sp_mode'                                 => 'Login Configuration',
     'saml_mode_add_btn'                            => 'Add a button for SAML login',
