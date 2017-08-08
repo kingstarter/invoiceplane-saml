@@ -20,6 +20,9 @@
                             <option value="1">
                                 <?php _trans('saml_mode_sso_only'); ?>
                             </option>
+                            <option value="2">
+                                <?php _trans('saml_mode_debug'); ?>
+                            </option>
                         </select>
                     </div>
 

@@ -13,6 +13,7 @@ $lang = array(
     'saml_sp_mode'                                 => 'Login Configuration',
     'saml_mode_add_btn'                            => 'Add a button for SAML login',
     'saml_mode_sso_only'                           => 'SAML-only login (remove login screen)',
+    'saml_mode_debug'                              => 'Debug: Display IDP SamlResponse during authentication',
     'saml_sp_entity_id'                            => 'SP Entity ID',
     'saml_sp_sso_url'                              => 'Single Signon Service URL',
     'saml_sp_slo_url'                              => 'Single Logout Service URL',

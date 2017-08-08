@@ -82,6 +82,7 @@ class Sessions extends Base_Controller
      */
     public function samllogin()
     {
+        log_message('debug', 'Make a samlauth request against IDP');
         $samlSettings = new SamlSettings();
         $authRequest = new \OneLogin_Saml2_Auth($samlSettings->getSamlSettings());
         $url = $authRequest->login();
@@ -91,42 +92,45 @@ class Sessions extends Base_Controller
     /**
      * Authenticate via SAML response from IDP
      */
-    public function samlauth()
+    public function samlauth($id = null)
     {
+        log_message('debug', 'Entering samlauth method');
         $this->load->model('mdl_sessions');
 
         $settings = new SamlSettings();
         try {
-            if (isset($_POST['SAMLResponse'])) {
+            if ($this->input->post('SAMLResponse')) {
                 $samlSettings = new \OneLogin_Saml2_Settings($settings->getSamlSettings(), true);
-                $samlResponse = new \OneLogin_Saml2_Response($samlSettings, $_POST['SAMLResponse']);
+                $samlResponse = new \OneLogin_Saml2_Response($samlSettings, $this->input->post('SAMLResponse'));
                 if ($samlResponse->isValid()) {
   
                     /**
-                     * DEBUG OUTPUT
-                     * Use this for debugging and checking your saml configuration
+                     * Debug output used in debug mode
                      */
-//                    /*
-                    echo 'You are: ' . $samlResponse->getNameId() . '<br>';
-                    $attributes = $samlResponse->getAttributes();
-                    if (!empty($attributes)) {
-                        echo 'You have the following attributes:<br>';
-                        echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
-                        foreach ($attributes as $attributeName => $attributeValues) {
-                           echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
-                           foreach ($attributeValues as $attributeValue) {
-                               echo '<li>' . htmlentities($attributeValue) . '</li>';
-                           }
-                           echo '</ul></td></tr>';
+                    if (get_setting('saml_sp_mode') == 2) {
+                        echo '<h2>Debug mode: Received SAML Response from IDP</h2>';
+                        echo 'You are: ' . $samlResponse->getNameId() . '<br>';
+                        $attributes = $samlResponse->getAttributes();
+                        if (!empty($attributes)) {
+                            echo 'You have the following attributes:<br>';
+                            echo '<table><thead><th>Name</th><th>Values</th></thead><tbody>';
+                            foreach ($attributes as $attributeName => $attributeValues) {
+                               echo '<tr><td>' . htmlentities($attributeName) . '</td><td><ul>';
+                               foreach ($attributeValues as $attributeValue) {
+                                   echo '<li>' . htmlentities($attributeValue) . '</li>';
+                               }
+                               echo '</ul></td></tr>';
+                            }
+                            echo '</tbody></table>';
                         }
-                        echo '</tbody></table>';
+                        echo '<br />Other attributes:<br /><ul>';
+                        echo '<li>Config username: ' . get_setting('saml_map_username') . '</li>';
+                        echo '<li>Config mailaddr: ' . get_setting('saml_map_mail') . '</li>';
+                        echo '</ul><br />';
+                        
+                        return true;
                     }
-                    echo '<br />Other attributes:<br /><ul>';
-                    echo '<li>Config username: ' . get_setting('saml_map_username') . '</li>';
-                    echo '<li>Config mailaddr: ' . get_setting('saml_map_mail') . '</li>';
-                    echo '</ul><br />';
-//                    */
-  
+
                     // Get attributes for SAML from configModel
                     $atrb_email     = get_setting('saml_map_mail');
                     $atrb_username  = get_setting('saml_map_username');
@@ -137,27 +141,31 @@ class Sessions extends Base_Controller
   
                     // Check if username and email are set
                     if (!empty($username) && !empty($email)) {
-                        // Create user by having email as username
-                        $this->userInfo = new SamlUserProvider($username, $email, '');
-                        return true;
-    
+                        // Run authentication method for session creation
+                        $this->mdl_sessions->samlauth($username, $email);
+                        // Redirect for new user
+                        if ($this->session->userdata('user_type') == 1) {
+                            redirect('dashboard');
+                        } elseif ($this->session->userdata('user_type') == 2) {
+                            redirect('guest');
+                        }
+                        // Actually there are only these two options, so this line 
+                        // should never be reached
                     } else {
                         die('Invalid username and email.');
                     }
-    
                 } else {
                     die('Invalid SAML Response.');
                 }
             } else {
-                // In case of no SAML response, go on with app
-                return false;
+                // In case of no SAML response, redirect to login
+                redirect('sessions/login');
             }
         } catch (Exception $e) {
             // In case of invalid SAML response:
             echo 'Invalid SAML Response: ' . $e->getMessage();
         }
-    
-        return false;
+        redirect('sessions/login');
     }
 
     /**

@@ -79,6 +79,25 @@ sub logdie {
     exit 1;
 }
 
+# Read file contents
+sub fin {
+    my ($file) = @_;
+    open my $in, '<:encoding(UTF-8)', $file or logdie "Could not open $file for reading $!";
+    local $/ = undef;
+    my $all = <$in>;
+    close $in;
+    return $all;
+}
+
+# Write content to file 
+sub fout {
+    my ($file, $content) = @_;
+    open my $out, '>:encoding(UTF-8)', $file or die "Could not open $file for writing $!";;
+    print $out $content;
+    close $out;
+    return;
+}
+
 ##########################################################################
 # Evaluation
 ##########################################################################
@@ -96,6 +115,7 @@ logdie "Vendor basedir lookup failed: $vendordir\n"
 
 my @files;
 
+### Copy module files
 # Collect all package sourcefiles
 find ( sub {
     return unless -f;
@@ -110,6 +130,20 @@ foreach(@files) {
     copy ($vendordir . '/src/' . $_, 'application/' . $_);
 }
 
+### Add API endpoint URL within csrf_exclude_uris
+# Read in file
+my $conffile = 'application/config/config.php';
+my $config = fin($conffile);
+# Append to empty array
+$config =~ s/\[\'csrf_exclude_uris\'\] = array\(\)/\[\'csrf_exclude_uris\'\] = array\(\'sessions\/samlauth\'\)/;
+# Append to non-empty array as first attribute
+$config =~ s/\[\'csrf_exclude_uris\'\] = array\(\h*\n/\[\'csrf_exclude_uris\'\] = array\(\n    \'sessions\/samlauth\',\n/;
+# Make a check that the entry is not added twice
+$config =~ s/\'sessions\/samlauth\',\s*\'sessions\/samlauth\'/\'sessions\/samlauth\'/;
+# Write all back
+fout($conffile, $config);
+
+### Copy language strings
 # Check language strings, append if missing
 my $addlang = 0;
 my $langfile = 'application/language/english/custom_lang.php';
