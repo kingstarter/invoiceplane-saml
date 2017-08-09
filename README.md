@@ -10,9 +10,14 @@ Automatic account creation has been added as well. When signing in via the IDP w
 
 ## Installation and configuration
 
-The package should be installed using ```composer```: 
+Base for the package is not the zip-package of the website but the development stack from github. First load the git master branch from [github](https://github.com/InvoicePlane/InvoicePlane). Then install the package using ```composer```: 
 
 ``` 
+git clone https://github.com/InvoicePlane/InvoicePlane.git
+cd InvoicePlane
+composer install
+npm install
+grunt build
 composer require "kingstarter/laravel-saml":"dev-master"
 ```
 

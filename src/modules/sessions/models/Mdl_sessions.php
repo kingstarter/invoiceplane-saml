@@ -8,6 +8,10 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
  * @copyright	Copyright (c) 2012 - 2017 InvoicePlane.com
  * @license		https://invoiceplane.com/license.txt
  * @link		https://invoiceplane.com
+ *
+ * This is a modified Sessions file for IP 1.5.3 (git master).
+ * Updated and modified for the kingstarter/invoiceplane-saml 
+ * plugin. 
  */
 
 /**
