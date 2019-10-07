@@ -1,6 +1,6 @@
 # InvoicePlane SAML Authentication Plugin
 
-This package is planned as a plugin to integrate SAML to [InvoicePlane 1 & 2](https://github.com/InvoicePlane/InvoicePlane). Using the package let InvoicePlane act as an SAML SP (Service Provider). An IDP integration is currently not planned. As during package development only InvoicePlane 1 is available, all further configurations are IP1 specific. 
+This package is planned as a plugin to integrate SAML to [InvoicePlane 1](https://github.com/InvoicePlane/InvoicePlane). Using the package let InvoicePlane act as an SAML SP (Service Provider). An IDP integration is currently not planned.
 
 ## Description
 
@@ -10,7 +10,7 @@ Automatic account creation has been added as well. When signing in via the IDP w
 
 ## Installation and configuration
 
-Base for the package is not the zip-package of the website but the development stack from github. First load the git master branch from [github](https://github.com/InvoicePlane/InvoicePlane). Then install the package using ```composer```: 
+Base for the package is not the zip-package of the website but the development stack from github. First load the git master branch from [github](https://github.com/InvoicePlane/InvoicePlane). Then install the package using `composer`: 
 
 ``` 
 git clone https://github.com/InvoicePlane/InvoicePlane.git

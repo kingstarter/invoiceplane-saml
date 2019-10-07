@@ -11,8 +11,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.6",
-        "onelogin/php-saml": "^2.11"
+        "php": ">=7.2",
+        "onelogin/php-saml": "^3.0"
     },
     "autoload": {
         "psr-4": {
